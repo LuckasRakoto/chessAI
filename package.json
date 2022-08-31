@@ -1,0 +1,23 @@
+{
+  "name": "chessai",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/LuckasRakoto/chessAI.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/LuckasRakoto/chessAI/issues"
+  },
+  "homepage": "https://github.com/LuckasRakoto/chessAI#readme",
+  "dependencies": {
+    "@chrisoakman/chessboardjs": "^1.0.0",
+    "chess.js": "^0.13.4"
+  }
+}
