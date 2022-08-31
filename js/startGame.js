@@ -1,4 +1,4 @@
-import * as chessjs from 'chess'
+import { Chess } from "../node_modules/chess.js/chess.js"
 
 function startGame(board) {
     var game = new Chess()
@@ -6,4 +6,4 @@ function startGame(board) {
     console.log('on est là')
 }
 
-export const startGame2 = {startGame}
+export const startGame2 = { startGame }
