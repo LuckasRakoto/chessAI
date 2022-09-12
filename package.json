@@ -18,6 +18,8 @@
   },
   "homepage": "https://github.com/LuckasRakoto/chessAI#readme",
   "dependencies": {
-    "chess.js": "^0.13.4"
+    "chess.js": "^0.13.4",
+    "http-server": "^14.1.1",
+    "jquery": "^3.6.1"
   }
 }
