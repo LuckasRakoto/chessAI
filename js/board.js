@@ -27,7 +27,7 @@ function onDrop(source, target) {
   if (move === null) return 'snapback'
 
   if (game.turn() === 'b') {
-    blackTurn(2)
+    blackTurn(3)
   }
 }
 
