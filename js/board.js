@@ -1,8 +1,5 @@
 import { Chess } from "../node_modules/chess.js/chess.js"
 
-// NOTE: this example uses the chess.js library:
-// https://github.com/jhlywa/chess.js
-
 var board = null
 var game = new Chess()
 
@@ -14,15 +11,9 @@ function onDragStart(source, piece, position, orientation) {
   if (piece.search(/^b/) !== -1) return false
 }
 
-function makeRandomMove() {
-  var possibleMoves = game.moves()
-
-  // game over
-  if (possibleMoves.length === 0) return
-
+function makeRandomMove(possibleMoves) {
   var randomIdx = Math.floor(Math.random() * possibleMoves.length)
-  game.move(possibleMoves[randomIdx])
-  board.position(game.fen())
+  return possibleMoves[randomIdx]
 }
 
 function onDrop(source, target) {
@@ -32,12 +23,12 @@ function onDrop(source, target) {
     to: target,
     promotion: 'q' // NOTE: always promote to a queen for example simplicity
   })
-
   // illegal move
   if (move === null) return 'snapback'
 
-  // make random legal move for black
-  window.setTimeout(makeRandomMove, 250)
+  if (game.turn() === 'b') {
+    blackTurn(2)
+  }
 }
 
 // update the board position after the piece snap
@@ -56,62 +47,105 @@ var config = {
 
 function evaluation(colorToEvaluate) {
   const piecesList = Object.entries(game.board())
-  console.log(piecesList)
   let summ = 0
   piecesList.forEach((element) => {
-    console.log('rentré dans la premiere loop')
     element[1].forEach((item) => {
       if (item == null) return
-      if (item.color === colorToEvaluate.data.color) {
-        console.log(item)
-        console.log("Rentré encore ici")
-        console.log(summ)
+      if (item.color === colorToEvaluate) {
         switch (item.type) {
           case "p":
-            console.log('pion')
             summ += 10
             break
           case "n":
-            console.log('cheval')
             summ += 30
             break
           case "b":
-            console.log('fou')
             summ += 30
             break
           case "r":
-            console.log('tour')
             summ += 50
             break
           case "q":
-            console.log('reine')
             summ += 90
             break
           case "k":
-            console.log('roi')
             summ += 900
             break
         }
-        console.log(summ)
-      } 
+      }
     })
   })
-  console.log("la somme des pièces est:", summ)
+  return summ
+}
+
+function evaluateBoard(color) {
+  if (color === 'w') {
+    return (evaluation('w')) - evaluation('b')
+  }
+  else {
+    return (evaluation('b') - evaluation('w'))
+  }
 }
 
 function goingBack() {
   game.move(game.undo())
-  console.log(game.undo())
   board.position(game.fen())
 }
 
-function minMax() {
-  return
+function blackTurn(depth) {
+  let iniState = game.fen()
+  let bestMove = minMax(depth, true, 'b')[0]
+  board.position(iniState)
+  game.load(iniState)
+  game.move(bestMove)
+  board.position(game.fen())
+}
+
+function minMax(depth, maximizingPLayer, maximizingColor) {
+  let moves = game.moves()
+  let bestMove = makeRandomMove(moves)
+  if ((depth === 0) || (game.game_over())) {
+    return [null, evaluateBoard(maximizingColor)]
+  }
+  if (maximizingPLayer) { 
+    let maxEval = -Infinity
+    for (let i = 0; i < moves.length; i++) {
+      game.move(moves[i])
+      board.position(game.fen())
+      let currentEval = minMax(depth - 1, false, maximizingColor)[1]
+      goingBack()
+      if (currentEval > maxEval) {
+        maxEval = currentEval
+        bestMove = moves[i]
+      }
+    }
+    return [bestMove, maxEval]
+  } else {
+    let minEval = Infinity
+    for (let i = 0; i < moves.length; i++) {
+      game.move(moves[i])
+      board.position(game.fen())
+      let currentEval = minMax(depth - 1, true, maximizingColor)[1]
+      goingBack()
+      if (currentEval < minEval) {
+        minEval = currentEval
+        bestMove = moves[i]
+      }
+    }
+    return [bestMove, minEval]
+  }
+
 }
 
 board = Chessboard('board2', config)
+
+function test() {
+  console.log('allo')
+  console.log(game.moves())
+}
 
 $('#startBtn').on('click', game.reset)
 $('#startBtn').on('click', board.start)
 $('#eval').on('click', { color: "b" }, evaluation)
 $('#Undo').on('click', goingBack)
+$('#testBtn').on('click', test)
